@@ -49,5 +49,23 @@ func main() {
 		panic("test")
 	})
 
-	http.ListenAndServe(":"+port, r)
+	r.Get("/json", func(w http.ResponseWriter, r *http.Request) {
+		type res struct {
+			Msg string `json:"message"`
+		}
+
+		respondWithJson(w, 200, res{
+			"Hello world",
+		})
+	})
+
+	r.Get("/err", func(w http.ResponseWriter, r *http.Request) {
+		respondWithErr(w, 400, "Sample error")
+	})
+
+	err := http.ListenAndServe(":"+port, r)
+
+	if err != nil {
+		log.Fatal("Server crashed: ", err)
+	}
 }

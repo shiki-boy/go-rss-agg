@@ -1,2 +1,5 @@
 server: 
-	@go build && ./go-rss-agg
+	@nodemon
+
+kill-server:
+	@sudo kill -9 `sudo lsof -t -i:8000`

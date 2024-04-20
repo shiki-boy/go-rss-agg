@@ -1,0 +1,15 @@
+{
+    "watch": [
+        "./",
+        ".env"
+    ],
+    "ext": "go,json",
+    "ignore": [
+        "vendor",
+        "go.sum",
+        "go-rss-agg",
+        "src/**/*.{spec,test}.ts"
+    ],
+    "exec": "go build && ./go-rss-agg",
+    "signal": "SIGTERM"
+}
