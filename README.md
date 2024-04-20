@@ -7,3 +7,4 @@
 5. go get github.com/go-chi/chi
 6. go get github.com/go-chi/cors
 7. added server restart with nodemon
+8. set -a && source .env && set +a # for setting env var for goose
