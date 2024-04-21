@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
@@ -8,8 +9,14 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
+	"github.com/shiki-boy/go-rss-agg/internal/database"
 )
+
+type apiConfig struct {
+	DB *database.Queries
+}
 
 func main() {
 	godotenv.Load(".env")
@@ -18,6 +25,19 @@ func main() {
 
 	if port == "" {
 		log.Fatal("No PORT provided! Exiting...")
+	}
+
+	conn, err := pgx.Connect(context.Background(), os.Getenv("DB_URL"))
+
+	if err != nil {
+		log.Fatal("Unable to connect to database: ", err)
+	}
+	log.Println("Successfully connected to DB")
+
+	defer conn.Close(context.Background())
+
+	apiCfg := apiConfig{
+		DB: database.New(conn),
 	}
 
 	r := chi.NewRouter()
@@ -63,7 +83,9 @@ func main() {
 		respondWithErr(w, 400, "Sample error")
 	})
 
-	err := http.ListenAndServe(":"+port, r)
+	r.Post("/users", apiCfg.handleCreateTodo)
+
+	err = http.ListenAndServe(":"+port, r)
 
 	if err != nil {
 		log.Fatal("Server crashed: ", err)
